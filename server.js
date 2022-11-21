@@ -27,17 +27,24 @@ app.use((err, req, res, next) => {
         message: err.message
     })
 })
- 
 
-mongoose.connect("mongodb://localhost:27017/nodewithmongodb", {
+
+// mongoose.connect('mongodb://localhost:27018/nodewithmongodb', {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+// }, function (err) {
+//     if (err) throw err;
+// });
+
+mongoose.connect("mongodb://localhost:27018/nodewithmongodb", {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
 
 var db = mongoose.connection;
-db.on('error', function(err) {console.log(error)});
-db.on('open', function callback () {
-  console.log("Db connected successfully");
+db.on('error', function (err) { console.log( "Db Error ", err) });
+db.on('open', function callback() {
+    console.log("Db connected successfully");
 });
 
 app.listen(port, () => {
