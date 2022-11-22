@@ -1,6 +1,6 @@
 const User = require('./userModel');
-
-
+const { createClient } = require('redis');
+const client = createClient();
 
 module.exports = {
 
@@ -25,5 +25,28 @@ module.exports = {
         }
 
 
+    },
+
+    getApiData: async function (req, res) {
+        try {
+            await client.connect();
+
+            console.log(await client.get('userData'));
+            var getData = JSON.parse(await client.get('userData'));
+            if (!getData) {
+                getData = await User.find({});
+                await client.set('userData', JSON.stringify(getData));
+            }
+            await client.disconnect();
+            return res.status(200).json({
+                message: "get data",
+                data: getData
+            })
+        }
+        catch (err) {
+            return res.status(500).json({
+                message: err.message
+            })
+        }
     }
 }
