@@ -4,7 +4,7 @@ const controller=require('./controller');
 
 
 
-router.get("/getApi",controller.checkName)
+router.post("/getApi",controller.checkName)
 
 
 module.exports = router

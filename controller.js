@@ -10,12 +10,12 @@ module.exports = {
         try {
 
             await User.create({
-                name: "wap",
-                email: "wap@gmail.com"
+                name: req.body.name,
+                email: req.body.email
             })
 
             return res.status(200).json({
-                message: "getApi"
+                message: "store successfully"
             })
         }
         catch (err) {
