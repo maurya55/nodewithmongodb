@@ -36,7 +36,7 @@ app.use((err, req, res, next) => {
 //     if (err) throw err;
 // });
 
-mongoose.connect("mongodb://localhost:27018/nodewithmongodb", {
+mongoose.connect(process.env.DB, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
