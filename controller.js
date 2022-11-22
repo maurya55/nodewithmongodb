@@ -15,7 +15,7 @@ module.exports = {
             })
 
             return res.status(200).json({
-                message: "store successfully125"
+                message: "store successfully"
             })
         }
         catch (err) {
