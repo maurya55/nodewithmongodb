@@ -35,18 +35,18 @@ module.exports = {
             var getData = JSON.parse(await client.get('userData'));
 
             if (!getData) {
-                redisstatus="set";
+                redisstatus = "set";
                 getData = await User.find({});
                 await client.set('userData', JSON.stringify(getData));
             }
-            else{
-                redisstatus="delete";
+            else {
+                redisstatus = "delete";
                 await client.del('userData');
             }
             await client.disconnect();
             return res.status(200).json({
                 redisstatus,
-                message: "get data",
+                message: "get data1",
                 data: getData
             })
         }
