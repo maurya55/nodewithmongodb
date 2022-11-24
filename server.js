@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 require('dotenv').config()
-
+const amqplib = require("amqplib");
 
 
 const port = 4200;
@@ -27,6 +27,100 @@ app.use((err, req, res, next) => {
         message: err.message
     })
 })
+
+
+async function rabbit(){
+    const queue = 'tasks';
+    // const conn = await amqplib.connect('amqp://localhost');
+    const conn = await amqplib.connect('amqps://xkqumufe:flJcTjPT68JSo4pVt2Fk249iWCtNi4GH@rabbit.lmq.cloudamqp.com/xkqumufe');
+
+    // const conn = await amqplib.connect({
+    //     protocol: 'amqp',
+    //     port: 5672,
+    //     host: "localhost:2000/",
+    //     // username: config.user,
+    //     // password: config.password,
+    //     frameMax: 4096
+    // });
+
+    const ch1 = await conn.createChannel();
+    await ch1.assertQueue(queue);  
+  
+    // Listener
+    ch1.consume(queue, (msg) => {
+        // console.log(msg)
+        if (msg !== null) {
+            let message = JSON.parse(msg.content.toString())
+            // console.log(message);
+            if (message.sendTo == "nodeWithMongodb") { 
+                console.log('Recieved:', message);
+                ch1.ack(msg);
+            }
+        } else {
+            console.log('Consumer cancelled by server');
+        }
+    });
+ 
+    // Sender
+    const ch2 = await conn.createChannel();
+
+   
+
+    setInterval(() => {
+        let message = {
+            sendTo: "nodeWithMongodb2",
+            data: `data send from nodeWithMongodb ${Date.now()} `,
+        }
+        ch2.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
+    }, 1000);
+}
+
+rabbit();
+
+// (async () => {
+//     const queue = 'tasks';
+//     // const conn = await amqplib.connect('amqp://localhost');
+//     const conn = await amqplib.connect('amqps://xkqumufe:flJcTjPT68JSo4pVt2Fk249iWCtNi4GH@rabbit.lmq.cloudamqp.com/xkqumufe');
+
+//     // const conn = await amqplib.connect({
+//     //     protocol: 'amqp',
+//     //     port: 5672,
+//     //     host: "localhost:2000/",
+//     //     // username: config.user,
+//     //     // password: config.password,
+//     //     frameMax: 4096
+//     // });
+
+//     const ch1 = await conn.createChannel();
+//     await ch1.assertQueue(queue);  
+  
+//     // Listener
+//     ch1.consume(queue, (msg) => {
+//         // console.log(msg)
+//         if (msg !== null) {
+//             let message = JSON.parse(msg.content.toString())
+//             // console.log(message);
+//             if (message.TYPE == "nodeWithMongodb") { 
+//                 console.log('Recieved:', message);
+//                 ch1.ack(msg);
+//             }
+//         } else {
+//             console.log('Consumer cancelled by server');
+//         }
+//     });
+ 
+//     // Sender
+//     const ch2 = await conn.createChannel();
+
+//     let message = {
+//         TYPE: "nodeWithMongodb2",
+//         data: 'data send from nodeWithMongodb',
+//     }
+
+//     setTimeout(() => {
+//         ch2.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
+//     }, 1000);
+// })();
 
 
 // mongoose.connect('mongodb://localhost:27018/nodewithmongodb', {
